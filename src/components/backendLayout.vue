@@ -1,5 +1,24 @@
 <template>
-    <div>
-        我是布局的组件
-    </div>
+  <div class="backend-layout">
+    <el-container>
+      <Sidebar />
+      <el-container>
+        <el-header><Navbar /></el-header>
+        <el-main><router-view></router-view></el-main>
+      </el-container>
+    </el-container>
+  </div>
 </template>
+
+<script setup>
+import Sidebar from "./Sidebar.vue";
+import Navbar from "./Navbar.vue";
+
+import { ref } from "vue";
+</script>
+
+<style lang="scss" scoped>
+.backend-layout {
+  height: 100vh;
+}
+</style>
