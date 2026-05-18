@@ -9,7 +9,6 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
 const props = defineProps({
   title: {
     type: String,
@@ -23,6 +22,7 @@ const props = defineProps({
   justify-content: space-between;
   align-items: center;
   background-color: #fff;
+  margin-bottom: 17px;
 }
 .page-title {
   font-size: 23px;
