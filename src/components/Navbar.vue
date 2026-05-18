@@ -2,7 +2,7 @@
   <div class="navbar">
     <!-- 左边导航栏 -->
     <div class="flex-box">
-      <el-button>
+      <el-button @click="handleCollapse">
         <el-icon><Expand /></el-icon>
       </el-button>
       <p class="page-title">导航栏</p>
@@ -28,6 +28,12 @@
   </div>
 </template>
 <script setup>
+import { useAdminStore } from "@/stores/admin";
+
+// const adminStore = useAdminStore();
+const handleCollapse = () => {
+  useAdminStore().toggleCollapse();
+};
 const handleCommand = (command) => {
   if (command === "logout") {
     // router.push("/login");
