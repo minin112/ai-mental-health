@@ -41,7 +41,7 @@ const iconUrl = new URL(
 
 <style lang="scss" scoped>
 .navbar {
-  height: 64px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
