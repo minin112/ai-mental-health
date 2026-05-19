@@ -49,6 +49,7 @@
 </template>
 <script setup>
 import { ref, reactive } from "vue";
+import { login } from "@/api/admin";
 
 const ruleFormRef = ref(); //得到表单实例
 const formData = reactive({
@@ -60,14 +61,20 @@ const rules = reactive({
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
 });
 //登录提交，formEl为ruleFormRef.value
-const submitForm = async (formEl) => {
+const submitForm = async (formEl) => {//
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     //验证表单数据
     if (valid) {
-      console.log(fields, "验证通过，准备提交");
-    } else {
-      console.log(fields, "验证失败");
+      login(formData).then((data) => {
+        //判断token是否存在
+        if (!data.token) {
+          return console.error("登录失败");
+        }
+        //登录成功，保存token和用户信息
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userInfo", JSON.stringify(data.userInfo));
+      });
     }
   });
 };

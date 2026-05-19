@@ -26,7 +26,7 @@ service.interceptors.response.use(
   (response) => {
     const { data, config } = response;
     //处理业务状态码
-    if (data.code === 200) {
+    if (data.code === "200") {
       return data.data; //返回业务数据
     } else {
       if (data.code === "-1") {
