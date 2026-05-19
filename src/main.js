@@ -14,6 +14,5 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }
 
-app.use(pinia);
 app.use(ElementPlus).use(router).use(pinia).mount("#app");
 //挂载路由实例到 Vue 应用实例
