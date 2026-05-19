@@ -50,6 +50,9 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { login } from "@/api/admin";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const ruleFormRef = ref(); //得到表单实例
 const formData = reactive({
@@ -61,7 +64,7 @@ const rules = reactive({
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
 });
 //登录提交，formEl为ruleFormRef.value
-const submitForm = async (formEl) => {//
+const submitForm = async (formEl) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     //验证表单数据
@@ -74,6 +77,11 @@ const submitForm = async (formEl) => {//
         //登录成功，保存token和用户信息
         localStorage.setItem("token", data.token);
         localStorage.setItem("userInfo", JSON.stringify(data.userInfo));
+        //根据用户角色决定跳转路径
+        if (data.userInfo.userType === 2) {
+          router.push("/back/dashboard");
+        } else {
+        }
       });
     }
   });
