@@ -6,6 +6,7 @@
       </template>
     </PageHead>
     <TableSearch :formItem="formItem" @search="handleSearch"></TableSearch>
+    <!-- 父组件通过@search事件监听子组件emits传递的查询参数 -->
   </div>
 </template>
 <script setup>

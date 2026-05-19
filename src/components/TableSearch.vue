@@ -40,6 +40,8 @@ const props = defineProps({
   },
 }); //props接受父组件传递的formItem数组，用于动态渲染表单组件
 const emit = defineEmits(["search"]);
+//子组件通过emit触发search事件，将formData作为参数传递给父组件
+//emits子给父发消息
 
 const formItemAttrs = computed(() => {
   const { formItem } = props;

@@ -14,7 +14,9 @@ const props = defineProps({
     type: String,
     default: "页面标题",
   },
-}); //props，用于接收props，用于接收父组件传递的title属性，如knowledge.vue中使用<PageHead title="知识文章" >
+});
+//props 父传给子数据
+//父组件通过title属性传递页面标题，子组件通过{{ props.title }}来访问
 </script>
 <style>
 .page-head {

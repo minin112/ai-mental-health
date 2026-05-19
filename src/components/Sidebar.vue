@@ -24,8 +24,8 @@
         :index="item.path"
         @click="selectMenu"
       >
-        <el-icon><component :is="item.meta.icon" /></el-icon>
-        <span>{{ item.meta.title }}</span>
+        <el-icon class="menu-icon"><component :is="item.meta.icon" /></el-icon>
+        <span class="menu-title">{{ item.meta.title }}</span>
       </el-menu-item>
     </el-menu>
   </el-aside>
@@ -76,6 +76,15 @@ const isCollapse = computed(() => useAdminStore().isCollapse); //监听isCollaps
         color: #909399;
       }
     }
+  }
+  .menu-icon {
+    font-size: 19px;
+    margin-right: 5px;
+  }
+  .menu-title {
+    font-size: 15px;
+    font-weight: normal;
+    color: #303133;
   }
 }
 </style>
