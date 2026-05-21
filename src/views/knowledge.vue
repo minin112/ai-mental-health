@@ -2,7 +2,7 @@
   <div>
     <PageHead title="知识文章">
       <template #buttons>
-        <el-button type="primary">新增</el-button>
+        <el-button type="primary" @click="dialogVisible = true">新增</el-button>
       </template>
     </PageHead>
     <TableSearch :formItem="formItem" @search="handleSearch"></TableSearch>
@@ -51,6 +51,11 @@
       :page-size="pagination.size"
       @change="handleChange"
     />
+    <!-- 新增文章弹窗 -->
+    <ArticleDialog
+      v-model:modelValue="dialogVisible"
+      :categories="categories"
+    />
   </div>
 </template>
 <script setup>
@@ -58,6 +63,7 @@ import { onMounted, reactive, ref } from "vue";
 import PageHead from "@/components/PageHead.vue";
 import TableSearch from "@/components/TableSearch.vue";
 import { categoryTree, articlePage } from "@/api/admin";
+import ArticleDialog from "@/components/ArticleDialog.vue";
 
 const formItem = [
   {
@@ -113,7 +119,7 @@ const handleSearch = async (formData) => {
 
   tableData.value = records;
   pagination.total = total;
-};
+}; //查询文章列表
 
 const handleChange = (page) => {
   pagination.currentPage = page;
@@ -125,6 +131,8 @@ const categoryMap = reactive([]);
 const categories = ref([]);
 //列表
 const tableData = ref([]);
+//新增文章弹窗,编辑
+const dialogVisible = ref(false);
 
 onMounted(async () => {
   const data = await categoryTree(); //调用categoryTree接口获取文章分类树
