@@ -33,15 +33,22 @@
             >编辑</el-button
           >
           <el-button
-            v-if="scope.row.status === 0 || scope.row.status === 2"
+            v-if="scope.row.status == 0 || scope.row.status == 2"
             text
             type="success"
+            @click="handlePublish(scope.row)"
             >发布</el-button
           >
-          <el-button v-if="scope.row.status === 1" text type="warning"
+          <el-button
+            v-if="scope.row.status == 1"
+            text
+            type="warning"
+            @click="handleUnpublish(scope.row)"
             >下线</el-button
           >
-          <el-button text type="danger">删除</el-button>
+          <el-button text type="danger" @click="handleDelete(scope.row)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -66,8 +73,15 @@
 import { onMounted, reactive, ref } from "vue";
 import PageHead from "@/components/PageHead.vue";
 import TableSearch from "@/components/TableSearch.vue";
-import { categoryTree, articlePage, getArticleDetail } from "@/api/admin";
+import {
+  categoryTree,
+  articlePage,
+  getArticleDetail,
+  changeArticleStatus,
+  deleteArticle,
+} from "@/api/admin";
 import ArticleDialog from "@/components/ArticleDialog.vue";
+import { ElMessageBox, ElMessage } from "element-plus";
 
 const formItem = [
   {
@@ -153,6 +167,46 @@ const handleEdit = (row) => {
       dialogVisible.value = true;
     });
   }
+};
+
+//发布文章
+const handlePublish = (row) => {
+  ElMessageBox.confirm(`确认发布文章${row.title}吗？`, "确认", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "info",
+  }).then(() => {
+    changeArticleStatus(row.id, { status: 1 }).then((res) => {
+      ElMessage.success("发布成功");
+      handleSearch(); //刷新列表
+    });
+  });
+};
+//下线文章
+const handleUnpublish = (row) => {
+  ElMessageBox.confirm(`确认下线文章${row.title}吗？`, "确认", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "danger",
+  }).then(() => {
+    changeArticleStatus(row.id, { status: 2 }).then((res) => {
+      ElMessage.success("下线成功");
+      handleSearch(); //刷新列表
+    });
+  });
+};
+//删除文章
+const handleDelete = (row) => {
+  ElMessageBox.confirm(`确认删除文章${row.title}吗？`, "确认", {
+    confirmButtonText: "确定删除",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    deleteArticle(row.id).then((res) => {
+      ElMessage.success("删除成功");
+      handleSearch(); //刷新列表
+    });
+  });
 };
 
 onMounted(async () => {

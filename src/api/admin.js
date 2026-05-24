@@ -37,3 +37,11 @@ export function getArticleDetail(id){
 export function updateArticle(id,data){
   return service.put(`/knowledge/article/${id}`,data); //更新文章接口
 }
+
+export function changeArticleStatus(id,data){
+  return service.put(`/knowledge/article/${id}/status`,data); //切换文章状态接口
+}
+
+export function deleteArticle(id){
+  return service.delete(`/knowledge/article/${id}`); //删除文章接口
+}
