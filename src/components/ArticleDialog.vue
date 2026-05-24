@@ -94,7 +94,9 @@
       <el-button @click="btnPreview = !btnPreview">{{
         btnPreview ? "关闭预览" : "预览效果"
       }}</el-button>
-      <el-button type="primary" @click="handleSubmit">提交文章</el-button>
+      <el-button type="primary" @click="handleSubmit" :loading="loading"
+        >提交文章</el-button
+      >
       <el-button @click="handleClose">取消</el-button>
     </template>
   </el-dialog>
@@ -102,7 +104,7 @@
 <script setup>
 import { ref, reactive, computed } from "vue";
 import { ElMessage } from "element-plus";
-import { uploadFile } from "@/api/admin";
+import { uploadFile, createArticle } from "@/api/admin";
 import { fileBaseUrl } from "@/config/index";
 import RichTextEditor from "@/components/RichTextEditor.vue";
 
@@ -116,7 +118,7 @@ const props = defineProps({
     default: () => [],
   },
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "success"]);
 const dialogVisible = computed({
   get() {
     return props.modelValue;
@@ -125,7 +127,9 @@ const dialogVisible = computed({
     emit("update:modelValue", val);
   },
 });
-const handleClose = () => {};
+const handleClose = () => {
+  dialogVisible.value = false;
+};
 
 const formData = reactive({
   title: "",
@@ -148,6 +152,10 @@ const rules = reactive({
   ],
   categoryId: [
     { required: true, message: "请选择文章分类", trigger: "change" },
+  ],
+  content: [
+    { required: true, message: "请输入文章内容", trigger: "blur" },
+    { max: 5000, message: "文章内容最多5000个字符", trigger: "blur" },
   ],
 });
 const commonTags = [
@@ -216,6 +224,26 @@ const handleEditorCreated = (editor) => {
 
 //预览效果
 const btnPreview = ref(false);
+
+//提交文章
+const formRef = ref(null);
+const loading = ref(false);
+const handleSubmit = () => {
+  formRef.value.validate(async (valid) => {
+    if (!valid) return;
+
+    loading.value = true;
+    const submitData = {
+      ...formData,
+      tags: formData.tagArray.join(","),
+    };
+    delete submitData.tagArray;
+    createArticle(submitData).then((res) => {
+      loading.value = false;
+      emit("success");
+    });
+  });
+};
 </script>
 <style scoped lang="scss">
 .cover-placeholder {

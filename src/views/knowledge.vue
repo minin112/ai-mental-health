@@ -26,7 +26,7 @@
       </el-table-column>
       <el-table-column prop="authorName" label="作者" width="150" />
       <el-table-column prop="readCount" label="阅读量" width="150" />
-      <el-table-column prop="publishedAt" label="发布时间" width="150" />
+      <el-table-column prop="updatedAt" label="发布时间" width="150" />
       <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
           <el-button text type="primary">编辑</el-button>
@@ -55,6 +55,7 @@
     <ArticleDialog
       v-model:modelValue="dialogVisible"
       :categories="categories"
+      @success="handleSuccess"
     />
   </div>
 </template>
@@ -133,6 +134,7 @@ const categories = ref([]);
 const tableData = ref([]);
 //新增文章弹窗,编辑
 const dialogVisible = ref(false);
+const handleSuccess = () => {};
 
 onMounted(async () => {
   const data = await categoryTree(); //调用categoryTree接口获取文章分类树

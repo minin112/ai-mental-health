@@ -12,7 +12,7 @@ service.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token"); //从localStorage中获取token
     if (token) {
-      config.headers.Authorization = token; //将token添加到请求头中
+      config.headers.Authorization = `Bearer ${token}`; //按 Bearer 规范携带 token
     }
     return config; //后端判断用户是否登录并返回配置对象
   },
