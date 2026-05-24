@@ -24,8 +24,16 @@ export function uploadFile(file, businessInfo) {
       "Content-Type": "multipart/form-data",
     },
   });
-}
+}//上传文件接口
 
 export  function createArticle(data) {
   return service.post("/knowledge/article", data); //创建文章接口
+}
+
+export function getArticleDetail(id){
+  return service.get(`/knowledge/article/${id}`); //获取文章详情接口
+}
+
+export function updateArticle(id,data){
+  return service.put(`/knowledge/article/${id}`,data); //更新文章接口
 }

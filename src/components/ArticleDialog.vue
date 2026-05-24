@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="文章详情"
+    :title="isEdit ? '编辑文章' : '新增文章'"
     v-model="dialogVisible"
     width="50%"
     @close="handleClose"
@@ -94,17 +94,17 @@
       <el-button @click="btnPreview = !btnPreview">{{
         btnPreview ? "关闭预览" : "预览效果"
       }}</el-button>
-      <el-button type="primary" @click="handleSubmit" :loading="loading"
-        >提交文章</el-button
-      >
+      <el-button type="primary" @click="handleSubmit" :loading="loading">{{
+        isEdit ? "更新文章" : "新增文章"
+      }}</el-button>
       <el-button @click="handleClose">取消</el-button>
     </template>
   </el-dialog>
 </template>
 <script setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, watch, nextTick } from "vue";
 import { ElMessage } from "element-plus";
-import { uploadFile, createArticle } from "@/api/admin";
+import { uploadFile, createArticle, updateArticle } from "@/api/admin";
 import { fileBaseUrl } from "@/config/index";
 import RichTextEditor from "@/components/RichTextEditor.vue";
 
@@ -117,6 +117,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  article: {
+    type: Object,
+    default: null,
+  },
 });
 const emit = defineEmits(["update:modelValue", "success"]);
 const dialogVisible = computed({
@@ -127,8 +131,33 @@ const dialogVisible = computed({
     emit("update:modelValue", val);
   },
 });
+
+const isEdit = computed(() => !!props.article?.id); //是否有id，有则等于布尔值true
+
+//监听编辑数据
+watch(
+  () => props.article,
+  (newval) => {
+    nextTick(() => {
+      Object.assign(formData, newval); //对象属性合并
+      //使用现有id
+      businessId.value = newval.id;
+      //封面URL
+      imgUrl.value = `${fileBaseUrl}${newval.coverImage}`;
+    });
+  },
+);
+
 const handleClose = () => {
-  dialogVisible.value = false;
+  //重置表单
+  formRef.value.resetFields();
+  //重置ID
+  businessId.value = null;
+  //重置标签
+  formData.tagArray = [];
+  //重置封面图片
+  handleRemove();
+  emit("update:modelValue", false);
 };
 
 const formData = reactive({
@@ -192,10 +221,11 @@ const beforeUpload = (file) => {
   }
   return isImage;
 };
+const businessId = ref(null);
 const handleUploadRequest = async ({ file }) => {
   //UUID生成
-  const businessId = crypto.randomUUID();
-  const fileRes = await uploadFile(file, { businessId: businessId });
+  businessId.value = crypto.randomUUID();
+  const fileRes = await uploadFile(file, { businessId: businessId.value });
 
   //拼接完整的图片URL
   imgUrl.value = `${fileBaseUrl}${fileRes.filePath}`;
@@ -238,10 +268,21 @@ const handleSubmit = () => {
       tags: formData.tagArray.join(","),
     };
     delete submitData.tagArray;
-    createArticle(submitData).then((res) => {
-      loading.value = false;
-      emit("success");
-    });
+
+    if (!isEdit.value) {
+      //若是新增
+      submitData.id = businessId.value;
+      createArticle(submitData).then((res) => {
+        loading.value = false;
+        emit("success");
+      });
+    } else {
+      //若是编辑
+      updateArticle(props.article.id, submitData).then((res) => {
+        loading.value = false;
+        emit("success");
+      });
+    }
   });
 };
 </script>

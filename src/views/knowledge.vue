@@ -2,7 +2,7 @@
   <div>
     <PageHead title="知识文章">
       <template #buttons>
-        <el-button type="primary" @click="dialogVisible = true">新增</el-button>
+        <el-button type="primary" @click="handleEdit({})">新增</el-button>
       </template>
     </PageHead>
     <TableSearch :formItem="formItem" @search="handleSearch"></TableSearch>
@@ -29,7 +29,9 @@
       <el-table-column prop="updatedAt" label="发布时间" width="150" />
       <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
-          <el-button text type="primary">编辑</el-button>
+          <el-button text type="primary" @click="handleEdit(scope.row)"
+            >编辑</el-button
+          >
           <el-button
             v-if="scope.row.status === 0 || scope.row.status === 2"
             text
@@ -56,6 +58,7 @@
       v-model:modelValue="dialogVisible"
       :categories="categories"
       @success="handleSuccess"
+      :article="currentArticle"
     />
   </div>
 </template>
@@ -63,7 +66,7 @@
 import { onMounted, reactive, ref } from "vue";
 import PageHead from "@/components/PageHead.vue";
 import TableSearch from "@/components/TableSearch.vue";
-import { categoryTree, articlePage } from "@/api/admin";
+import { categoryTree, articlePage, getArticleDetail } from "@/api/admin";
 import ArticleDialog from "@/components/ArticleDialog.vue";
 
 const formItem = [
@@ -134,7 +137,23 @@ const categories = ref([]);
 const tableData = ref([]);
 //新增文章弹窗,编辑
 const dialogVisible = ref(false);
-const handleSuccess = () => {};
+const currentArticle = ref(null);
+const handleSuccess = () => {
+  dialogVisible.value = false;
+  handleSearch(); //刷新列表
+};
+const handleEdit = (row) => {
+  if (!row.id) {
+    currentArticle.value = null;
+    dialogVisible.value = true;
+  } else {
+    getArticleDetail(row.id).then((res) => {
+      console.log(res, "编辑文章");
+      currentArticle.value = res;
+      dialogVisible.value = true;
+    });
+  }
+};
 
 onMounted(async () => {
   const data = await categoryTree(); //调用categoryTree接口获取文章分类树
