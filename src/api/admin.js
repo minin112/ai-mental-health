@@ -53,3 +53,12 @@ export function getConsultationsPage(params){
 export function getSessionDetail(sessionId){
   return service.get(`/psychological-chat/sessions/${sessionId}/messages`); //获取咨询记录详情接口
 }
+
+export function getEmotionalPage(params){
+  console.log(params);
+  return service.get("/emotion-diary/admin/page", { params }); //获取情绪日志列表接口
+}
+
+export function deleteEmotional(id){
+  return service.delete(`/emotion-diary/admin/${id}`); //删除情绪日志接口
+}
