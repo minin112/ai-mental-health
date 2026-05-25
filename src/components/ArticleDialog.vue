@@ -4,6 +4,7 @@
     v-model="dialogVisible"
     width="50%"
     @close="handleClose"
+    :close-on-click-modal="false"
   >
     <el-form :model="formData" :rules="rules" ref="formRef" label-width="120px">
       <el-form-item label="文章标题" prop="title">

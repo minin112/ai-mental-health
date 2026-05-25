@@ -45,3 +45,11 @@ export function changeArticleStatus(id,data){
 export function deleteArticle(id){
   return service.delete(`/knowledge/article/${id}`); //删除文章接口
 }
+
+export function getConsultationsPage(params){
+  return service.get("/psychological-chat/sessions", { params }); //获取咨询记录列表接口
+}
+
+export function getSessionDetail(sessionId){
+  return service.get(`/psychological-chat/sessions/${sessionId}/messages`); //获取咨询记录详情接口
+}
