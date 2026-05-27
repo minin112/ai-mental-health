@@ -35,7 +35,7 @@
           <el-button text type="primary" @click="viewSessionDetail(scope.row)"
             >详情</el-button
           >
-
+          <!-- 作用域插槽 获取子组件弹窗内部的数据 -->
           <el-button text type="danger" @click="handleDelete(scope.row)"
             >删除</el-button
           >
