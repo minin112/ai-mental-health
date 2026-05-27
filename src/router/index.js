@@ -1,6 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import BackendLayout from "@/components/BackendLayout.vue";
 import AuthLayout from "@/components/AuthLayout.vue";
+import FrontendLayout from "@/components/FrontendLayout.vue";
+import consultation from "@/views/consultation.vue";
+import home from "@/views/home.vue";
+import emtionDiary from "@/views/emtionDiary.vue";
+import frontendknowledge from "@/views/frontendknowledge.vue";
 
 //路由配置
 const backendRoutes = [
@@ -64,10 +69,36 @@ const backendRoutes = [
     ],
   },
 ];
+const frontendRoutes = [
+  {
+    path: "/",
+    component: FrontendLayout,
+    children: [
+      {
+        path: "",
+        component: () => import("@/views/home.vue"),
+      },
+      {
+        path: "consultation",
+        component: () => import("@/views/consultation.vue"),      
+      },
+      {
+        path: "emtionDiary",
+        component: () => import("@/views/emtionDiary.vue"),
+       
+      },
+      {
+        path: "frontendknowledge",
+        component: () => import("@/views/frontendknowledge.vue"),
+        
+      },
+    ],
+  },
+];
 //创建路由实例
 const router = createRouter({
   history: createWebHistory(),
-  routes: backendRoutes,
+  routes: [...backendRoutes, ...frontendRoutes],
 });
 
 //路由前置守卫
