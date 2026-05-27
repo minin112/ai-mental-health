@@ -6,6 +6,7 @@ import AuthLayout from "@/components/AuthLayout.vue";
 const backendRoutes = [
   {
     path: "/back",
+    redirect: "/back/dashboard",//已登陆情况下默认跳转
     component: BackendLayout,
     children: [
       {
@@ -68,5 +69,32 @@ const router = createRouter({
   history: createWebHistory(),
   routes: backendRoutes,
 });
+
+//路由前置守卫
+router.beforeEach((to, from, next) => {
+  const token=localStorage.getItem("token");
+  //如果token存在，说明已登录，直接放行
+  if(token){
+    const userInfo=JSON.parse(localStorage.getItem("userInfo"));
+    //如果是后台用户
+    if(userInfo.userType==2){
+      if(to.path.startsWith("/back")){
+        next();
+      }else{
+        next("/back/dashboard");
+      }}
+      //如果是普通用户
+    else if(userInfo.userType==1){
+    }
+    }else{
+        if(to.path.startsWith("/back")){
+        next("/auth/login");
+      }else{
+        next();
+      }
+
+  }
+})
+
 //导出路由实例，以便在 main.js 中通过 app.use(router) 挂载到 Vue
 export default router;

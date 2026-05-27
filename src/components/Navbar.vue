@@ -5,7 +5,7 @@
       <el-button @click="handleCollapse">
         <el-icon><Expand /></el-icon>
       </el-button>
-      <p class="page-title">导航栏</p>
+      <p class="page-title">{{ route.meta.title }}</p>
     </div>
     <!-- 右边头像下拉菜单 -->
     <div class="flex-box">
@@ -29,6 +29,13 @@
 </template>
 <script setup>
 import { useAdminStore } from "@/stores/admin";
+import { useRouter, useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+import { logout } from "@/api/admin";
+
+const router = useRouter();
+const route = useRoute();
+console.log(route.meta.title, "route.meta.title");
 
 // const adminStore = useAdminStore();
 const handleCollapse = () => {
@@ -36,7 +43,14 @@ const handleCollapse = () => {
 };
 const handleCommand = (command) => {
   if (command === "logout") {
-    // router.push("/login");
+    ElMessage.success("退出登录成功");
+    logout().then(() => {
+      //清除缓存
+      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
+      //跳转登录页
+      router.push("/auth/login");
+    });
   }
 };
 const iconUrl = new URL(

@@ -66,3 +66,7 @@ export function deleteEmotional(id){
 export function getAnalyticsOverview(){
   return service.get(`/data-analytics/overview`); //获取数据分析概览接口
 }
+
+export function logout(){
+  return service.post("/user/logout"); //退出登录接口
+}
