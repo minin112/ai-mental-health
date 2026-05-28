@@ -7,10 +7,10 @@
       </div>
       <div class="nav-section">
         <router-link to="/" class="nav-link">首页</router-link>
-        <router-link to="/consultion" class="nav-link" v-if="isLoggedIn"
+        <router-link to="/consultation" class="nav-link" v-if="isLoggedIn"
           >AI咨询</router-link
         >
-        <router-link to="/emtion-diary" class="nav-link" v-if="isLoggedIn"
+        <router-link to="/emotionDiary" class="nav-link" v-if="isLoggedIn"
           >情感日记</router-link
         >
         <router-link to="/frontendknowledge" class="nav-link"
