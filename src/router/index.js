@@ -116,8 +116,14 @@ router.beforeEach((to, from, next) => {
       }}
       //如果是普通用户
     else if(userInfo.userType==1){
+      if(to.path.startsWith("/back")||to.path.startsWith("/auth")){
+        next("/");
+      }else{
+        next();
+      }
     }
-    }else{
+  
+  }else{
         if(to.path.startsWith("/back")){
         next("/auth/login");
       }else{

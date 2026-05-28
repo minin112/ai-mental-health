@@ -16,7 +16,9 @@
         <router-link to="/frontendknowledge" class="nav-link"
           >知识库</router-link
         >
-        <el-button class="logout-btn" v-if="isLoggedIn">退出登录</el-button>
+        <el-button class="logout-btn" v-if="isLoggedIn" @click="handleLogout"
+          >退出登录</el-button
+        >
         <template v-else>
           <router-link to="/auth/login" class="nav-link">登录</router-link>
           <router-link to="/auth/register" class="nav-link">
@@ -36,14 +38,27 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted } from "vue";
+import { logout } from "@/api/admin";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const iconURL = new URL(
-  "@/assets/images/AIjiqiren-icon-AI-2d.png",
+  "../assets/images/AIjiqiren-icon-AI-2d.png",
   import.meta.url,
 ).href;
 const isLoggedIn = ref(false);
 
+//退出登录
+const handleLogout = () => {
+  logout().then(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+
+    router.push("/auth/login");
+  });
+};
 onMounted(() => {
   isLoggedIn.value = localStorage.getItem("token") ? true : false;
 });
