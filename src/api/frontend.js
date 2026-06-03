@@ -8,3 +8,16 @@ export const startSession=(data) => {
     return service.post('/psychological-chat/session/start', data)
 }
 
+export const getSessionList=(params) => {
+    return service.get('/psychological-chat/sessions',{params})
+}
+
+export const deleteSession=(sessionId) => {
+    return service.delete(`/psychological-chat/sessions/${sessionId}`)
+}
+
+//获取会话消息列表详情
+export const getSessionDetail=(sessionId) => {
+    return service.get(`/psychological-chat/sessions/${sessionId}/messages
+`)
+}   
