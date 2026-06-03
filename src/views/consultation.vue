@@ -162,8 +162,17 @@
             class="message-input"
             clearable
           />
+          <div class="input-footer">
+            <span>按Enter发送消息，shift+Enter换行</span>
+            <span>{{ userMessage.length }}/500</span>
+          </div>
         </div>
-        <el-button @click="sendMessage" class="send-btn" type="primary">
+        <el-button
+          :disabled="!userMessage.trim() || userMessage.length > 500"
+          @click="sendMessage"
+          class="send-btn"
+          type="primary"
+        >
           <el-icon style="font-size: 30px">
             <Promotion />
           </el-icon>
