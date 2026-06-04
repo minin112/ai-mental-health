@@ -80,7 +80,10 @@
       <!-- 聊天消息区域 -->
       <div class="chat-messages">
         <!-- 欢迎用语 -->
-        <div class="message-item ai-message" v-if="message.length === 0">
+        <div
+          class="message-item ai-message"
+          v-if="!messages || messages.length === 0"
+        >
           <div class="message-avatar">
             <el-image :src="iconURL" style="width: 18px; height: 18px" />
           </div>
@@ -97,7 +100,7 @@
         <div
           class="message-item"
           :class="msg.senderType === 1 ? 'user-message' : 'ai-message'"
-          v-for="msg in message"
+          v-for="msg in messages"
           :key="msg.id"
         >
           <div class="message-avatar">
@@ -198,6 +201,7 @@ import {
 } from "@/api/frontend";
 import { ElMessage } from "element-plus";
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 const iconURL = new URL("@/assets/images/robot-fill.png", import.meta.url).href;
 const iconURL1 = new URL("@/assets/images/like.png", import.meta.url).href;
@@ -212,6 +216,8 @@ const createNewFrontendSession = () => {
     sessionTitle: "新对话",
   };
   currentSession.value = newSession;
+  // 关键修复：清空之前的聊天消息
+  messages.value = [];
 };
 
 //定义一个当前会话对象
@@ -220,7 +226,7 @@ const currentSession = ref(null);
 const sessionList = ref([]);
 
 //定义对话消息
-const message = ref([]);
+const messages = ref([]);
 //定义用户输入消息
 const userMessage = ref("");
 //定义AI是否正在输入
@@ -249,6 +255,16 @@ const sendMessage = () => {
   //如果没有会话或者是临时会话就需要新建一个
   if (!currentSession.value || currentSession.value.status === "TEMP") {
     startNewSession(message);
+  } else {
+    //继续现有会话
+    messages.value.push({
+      id: Date.now(),
+      senderType: 1,
+      content: message,
+      createdAt: new Date().toLocaleString(),
+    });
+    //开始流式对话
+    startAiResponse(currentSession.value.sessionId, message);
   }
 };
 
@@ -282,7 +298,99 @@ const startNewSession = (message) => {
     }
     //更新会话列表
     getSessionPage();
+
+    //添加初始用户消息
+    messages.value.push({
+      id: Date.now(),
+      senderType: 1,
+      content: message,
+      createdAt: new Date().toLocaleString(),
+    });
+
+    //开始流式对话
+    startAiResponse(currentSession.value.sessionId, message);
   });
+};
+
+const startAiResponse = (sessionId, userMessage) => {
+  //防止重复发送
+  if (isAiTyping.value) {
+    ElMessage.error("请稍后再发送");
+    return;
+  }
+  isAiTyping.value = true;
+
+  const aiMessage = {
+    id: `ai_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    senderType: 2,
+    content: "",
+    createdAt: new Date().toLocaleString(),
+  };
+  //将AI消息添加到消息列表
+  messages.value.push(aiMessage);
+
+  //调用流式接口
+  const ctrl = new AbortController(); //用来中止fetch请求
+  fetchEventSource(`/api/psychological-chat/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Token: localStorage.getItem("token"),
+      Accept: "text/event-stream",
+    },
+    body: JSON.stringify({
+      sessionId,
+      userMessage,
+    }),
+    signal: ctrl.signal,
+    onopen: (responce) => {
+      console.log(responce);
+      // 只有当 Content-Type 不是 text/event-stream 时才报错
+      if (responce.headers.get("Content-Type") !== "text/event-stream") {
+        ElMessage.error("服务器返回非流式数据");
+      }
+    },
+    onmessage: (event) => {
+      const raw = event.data.trim();
+      if (!raw) return;
+      const eventName = event.event;
+      //当前会话的ai消息
+      const aiMessage = messages.value[messages.value.length - 1];
+
+      if (eventName === "done") {
+        isAiTyping.value = false;
+        ctrl.abort();
+        return;
+      }
+      const payload = JSON.parse(raw);
+      const ok = String(payload.code) === "200";
+      if (ok && payload.data && payload.data.content) {
+        // 核心修改：不要直接替换，而是累加 (追加)
+        aiMessage.content += payload.data.content;
+      } else if (!ok) {
+        //错误回复的显示
+        handleError(payload.message || "AI回复失败");
+      }
+    },
+    onError: (error) => {
+      handleError(error || "AI回复失败");
+      throw error;
+    },
+    onClose: () => {
+      //开始情绪分析
+    },
+  });
+};
+
+//错误处理函数
+const handleError = (error) => {
+  //当前会话的ai消息
+  const aiMessage = messages.value[messages.value.length - 1];
+  if (aiMessage) {
+    aiMessage.content = "AI回复失败，请重试";
+  }
+  isAiTyping.value = false;
+  ElMessage.error("AI回复失败，请重试");
 };
 
 //获取会话列表
@@ -300,8 +408,15 @@ const getSessionPage = () => {
 const handleSessionClick = (session) => {
   //获取会话消息列表详情
   getSessionDetail(session.id).then((res) => {
-    message.value = res;
+    messages.value = res;
   });
+  //更新当前会话对象数据
+  const sessionData = {
+    sessionId: `session_${session.id}`,
+    status: "ACTIVE",
+    sessionTitle: session.sessionTitle,
+  };
+  currentSession.value = sessionData;
 };
 //删除会话
 const handleDeleteSession = (sessionId) => {
