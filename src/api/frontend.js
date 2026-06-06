@@ -21,3 +21,7 @@ export const getSessionDetail=(sessionId) => {
     return service.get(`/psychological-chat/sessions/${sessionId}/messages
 `)
 }   
+
+export const getSessionEmotion=(sessionId) => {
+    return service.get(`/psychological-chat/session/${sessionId}/emotion`)
+}
