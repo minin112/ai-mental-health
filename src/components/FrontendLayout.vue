@@ -11,7 +11,7 @@
           >AI咨询</router-link
         >
         <router-link to="/emotionDiary" class="nav-link" v-if="isLoggedIn"
-          >情感日记</router-link
+          >情绪日记</router-link
         >
         <router-link to="/frontendknowledge" class="nav-link"
           >知识库</router-link
