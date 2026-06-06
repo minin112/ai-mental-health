@@ -69,6 +69,9 @@
           >
         </el-form-item>
       </el-form>
+      <div class="footer">
+        <p>已有帐户？<router-link to="/auth/login">去登录</router-link></p>
+      </div>
     </div>
   </div>
 </template>

@@ -2,8 +2,10 @@
   <div class="container">
     <div class="title">
       <div class="back-home">
-        <el-icon><Back /></el-icon>
-        返回首页
+        <router-link to="/">
+          <el-icon><Back /></el-icon>
+          返回首页
+        </router-link>
       </div>
       <div class="title-text">
         <h2>登录您的账户</h2>
@@ -51,6 +53,7 @@
 import { ref, reactive } from "vue";
 import { login } from "@/api/admin";
 import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 
 const router = useRouter();
 
