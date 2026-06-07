@@ -5,118 +5,113 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
+import MarkdownIt from "markdown-it";
+import DOMPurify from "dompurify";
+
+const md = new MarkdownIt({
+  html: false,
+  linkify: true,
+  breaks: true,
+  typographer: true,
+});
+
+const defaultLinkOpenRenderer =
+  md.renderer.rules.link_open ||
+  ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
+
+md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+  const token = tokens[idx];
+
+  token.attrSet("target", "_blank");
+  token.attrSet("rel", "noopener noreferrer nofollow");
+
+  return defaultLinkOpenRenderer(tokens, idx, options, env, self);
+};
+
+md.renderer.rules.code_inline = (tokens, idx) => {
+  return `<code class="inline-code">${md.utils.escapeHtml(tokens[idx].content)}</code>`;
+};
+
+md.renderer.rules.fence = (tokens, idx) => {
+  const token = tokens[idx];
+  const lang = token.info ? ` language-${md.utils.escapeHtml(token.info.trim())}` : "";
+
+  return `<pre class="code-block"><code class="${lang.trim()}">${md.utils.escapeHtml(token.content)}</code></pre>`;
+};
+
+md.renderer.rules.code_block = (tokens, idx) => {
+  return `<pre class="code-block"><code>${md.utils.escapeHtml(tokens[idx].content)}</code></pre>`;
+};
 
 const props = defineProps({
   content: {
     type: String,
-    required: true
+    required: true,
   },
   isAiMessage: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
-// 简单的Markdown渲染器
 const renderedContent = computed(() => {
-  let html = props.content
+  const html = md.render(props.content || "");
 
-  // 转义HTML标签（防止XSS）
-  html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-
-  // 处理代码块（```）
-  html = html.replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
-    return `<pre class="code-block"><code class="language-${lang || 'text'}">${code.trim()}</code></pre>`
-  })
-
-  // 处理行内代码（`）
-  html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
-
-  // 处理粗体（**）
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-
-  // 处理斜体（*）
-  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>')
-
-  // 处理标题
-  html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>')
-  html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>')
-  html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>')
-
-  // 处理链接
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-
-  // 处理无序列表
-  html = html.replace(/^- (.*)$/gm, '<li>$1</li>')
-  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-
-  // 处理有序列表
-  html = html.replace(/^\d+\. (.*)$/gm, '<li>$1</li>')
-
-  // 处理引用
-  html = html.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>')
-
-  // 处理分割线
-  html = html.replace(/^---$/gm, '<hr>')
-
-  // 处理换行
-  html = html.replace(/\n/g, '<br>')
-
-  // 清理多余的br标签
-  html = html.replace(/<br><br>/g, '<br>')
-
-  return html
-})
+  return DOMPurify.sanitize(html, {
+    USE_PROFILES: { html: true },
+    ADD_ATTR: ["target", "rel"],
+  });
+});
 </script>
 
 <style scoped>
 .markdown-content {
   line-height: 1.6;
   color: inherit;
+  word-break: break-word;
 }
 
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3 {
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3) {
   margin: 1em 0 0.5em 0;
   font-weight: 600;
   line-height: 1.3;
 }
 
-.markdown-content h1 {
+.markdown-content :deep(h1) {
   font-size: 1.5em;
   border-bottom: 2px solid #e5e7eb;
   padding-bottom: 0.3em;
 }
 
-.markdown-content h2 {
+.markdown-content :deep(h2) {
   font-size: 1.3em;
   color: #374151;
 }
 
-.markdown-content h3 {
+.markdown-content :deep(h3) {
   font-size: 1.1em;
   color: #4b5563;
 }
 
-.markdown-content p {
+.markdown-content :deep(p) {
   margin: 0.5em 0;
 }
 
-.markdown-content ul,
-.markdown-content ol {
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
   margin: 0.5em 0;
   padding-left: 1.5em;
 }
 
-.markdown-content li {
+.markdown-content :deep(li) {
   margin: 0.3em 0;
 }
 
-.markdown-content blockquote {
+.markdown-content :deep(blockquote) {
   border-left: 4px solid #d1d5db;
-  padding-left: 1em;
   margin: 1em 0;
   color: #6b7280;
   font-style: italic;
@@ -125,84 +120,79 @@ const renderedContent = computed(() => {
   padding: 0.5em 1em;
 }
 
-.ai-markdown blockquote {
+.ai-markdown :deep(blockquote) {
   border-left-color: #3b82f6;
   background: #eff6ff;
 }
 
-.markdown-content hr {
+.markdown-content :deep(hr) {
   border: none;
   border-top: 2px solid #e5e7eb;
   margin: 1.5em 0;
 }
 
-.markdown-content code.inline-code {
+.markdown-content :deep(code.inline-code) {
   background: #f3f4f6;
   padding: 0.2em 0.4em;
   border-radius: 0.25em;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
   font-size: 0.85em;
   color: #e11d48;
 }
 
-.ai-markdown code.inline-code {
+.ai-markdown :deep(code.inline-code) {
   background: #dbeafe;
   color: #1e40af;
 }
 
-.markdown-content pre.code-block {
+.markdown-content :deep(pre.code-block) {
   background: #1f2937;
   color: #f9fafb;
   padding: 1em;
   border-radius: 0.5em;
   overflow-x: auto;
   margin: 1em 0;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
   font-size: 0.85em;
   line-height: 1.4;
 }
 
-.markdown-content pre.code-block code {
+.markdown-content :deep(pre.code-block code) {
   background: none;
   padding: 0;
   color: inherit;
 }
 
-.markdown-content a {
+.markdown-content :deep(a) {
   color: #3b82f6;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s ease;
 }
 
-.markdown-content a:hover {
+.markdown-content :deep(a:hover) {
   border-bottom-color: #3b82f6;
 }
 
-.ai-markdown a {
+.ai-markdown :deep(a) {
   color: #1e40af;
 }
 
-.ai-markdown a:hover {
+.ai-markdown :deep(a:hover) {
   border-bottom-color: #1e40af;
 }
 
-.markdown-content strong {
+.markdown-content :deep(strong) {
   font-weight: 600;
   color: #374151;
 }
 
-.ai-markdown strong {
+.ai-markdown :deep(strong) {
   color: #1e40af;
 }
 
-.markdown-content em {
+.markdown-content :deep(em) {
   font-style: italic;
   color: #6b7280;
 }
 </style>
-
-
-
-
-
