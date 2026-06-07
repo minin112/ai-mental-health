@@ -1,5 +1,250 @@
-# Vue 3 + Vite
+# AI 心理咨询交互平台
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 项目简介
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+AI 心理咨询交互平台是一款基于 Vue3 + Vite 开发的智能心理健康服务平台。
+
+项目围绕心理咨询场景构建，通过 AI 对话、情绪记录、心理知识科普等功能，为用户提供便捷的心理支持服务。同时提供后台管理系统，用于文章管理、咨询记录管理、情绪日志管理及数据统计分析。
+
+项目采用前后端分离架构，集成 AI 对话能力，支持实时消息交互，并结合数据可视化技术提升后台运营管理效率。
+
+---
+
+## 技术栈
+
+### 前端框架
+
+- Vue3
+- Vite
+- Vue Router
+- Pinia
+
+### UI组件
+
+- Element Plus
+- Element Plus Icons
+
+### 网络通信
+
+- Axios
+- Fetch Event Source（SSE流式通信）
+
+### 数据可视化
+
+- ECharts
+
+### 富文本编辑
+
+- WangEditor
+
+### 样式方案
+
+- SCSS
+
+---
+
+## 核心功能
+
+### 用户端
+
+#### 首页展示
+
+- 平台介绍
+- 心理健康宣传
+- 推荐内容展示
+
+#### AI心理咨询
+
+- AI智能对话
+- 多轮会话交互
+- 咨询记录管理
+- 历史会话查看
+
+#### 情绪日志
+
+- 情绪记录
+- 心情追踪
+- 日志管理
+
+#### 心理知识
+
+- 心理健康文章浏览
+- 心理知识学习
+
+#### 用户中心
+
+- 登录注册
+- 个人信息管理
+
+---
+
+### 管理后台
+
+#### 数据统计
+
+- 平台运营数据统计
+- 数据可视化展示
+
+#### 心理文章管理
+
+- 文章发布
+- 文章编辑
+- 文章删除
+
+#### 情绪日志管理
+
+- 日志查询
+- 数据管理
+
+#### 咨询记录管理
+
+- AI咨询记录管理
+- 会话数据查看
+
+#### 用户管理
+
+- 用户信息管理
+
+---
+
+## 项目亮点
+
+### 1. AI心理咨询场景设计
+
+基于心理咨询业务场景构建 AI 智能对话模块，实现用户与 AI 的实时交流，提高平台交互体验。
+
+### 2. SSE流式消息返回
+
+采用 Fetch Event Source 实现 AI 回复流式输出，支持消息实时渲染，提升用户对话体验。
+
+### 3. Axios统一请求封装
+
+封装统一请求模块，实现：
+
+- 请求拦截
+- Token自动携带
+- 统一异常处理
+- 登录失效处理
+
+提高项目可维护性。
+
+### 4. 前后台双端架构
+
+项目同时包含：
+
+- 用户端
+- 管理后台
+- 登录认证模块
+
+采用模块化设计，提升系统扩展能力。
+
+### 5. 数据可视化分析
+
+基于 ECharts 实现后台数据统计与图表展示，提高运营数据分析效率。
+
+---
+
+## 项目结构
+
+```text
+src
+├── api                 接口管理
+├── assets              静态资源
+├── components          公共组件
+├── layout              页面布局
+├── router              路由管理
+├── stores              Pinia状态管理
+├── utils               工具函数
+├── views
+│   ├── frontend        用户端页面
+│   ├── backend         后台管理页面
+│   └── auth            登录认证页面
+├── App.vue
+└── main.js
+```
+
+---
+
+## 项目启动
+
+安装依赖
+
+```bash
+npm install
+```
+
+启动项目
+
+```bash
+npm run dev
+```
+
+生产构建
+
+```bash
+npm run build
+```
+
+预览构建结果
+
+```bash
+npm run preview
+```
+
+---
+
+## 环境配置
+
+开发环境通过 Vite Proxy 转发接口请求：
+
+```js
+/api -> 后端服务
+```
+
+可根据实际部署环境修改：
+
+```js
+vite.config.js;
+```
+
+中的代理配置。
+
+---
+
+## 后续优化方向
+
+- AI咨询上下文记忆优化
+- 会话搜索与分类管理
+- 深色模式支持
+- 心理测评模块
+- AI情绪分析可视化
+- 移动端适配优化
+
+---
+
+## 简历项目描述
+
+AI心理咨询交互平台（Vue3）
+
+技术栈：Vue3、Vite、Pinia、Vue Router、Axios、Element Plus、ECharts、SSE
+
+项目简介：
+
+基于 Vue3 构建的 AI 心理咨询平台，集成 AI 智能对话、情绪日志记录、心理知识科普及后台管理功能，通过实时消息交互与数据可视化提升用户体验和运营效率。
+
+项目职责：
+
+- 基于 Vue3 + Vite 搭建前端工程化项目架构；
+- 封装 Axios 请求模块，实现 Token 鉴权及统一异常处理；
+- 实现 AI 心理咨询对话模块，支持实时消息交互；
+- 基于 ECharts 开发后台数据统计与可视化展示页面；
+- 完成用户端与后台管理端路由设计及权限控制。
+
+项目亮点：
+
+- 基于 SSE 实现 AI 回复流式输出，优化对话交互体验；
+- 采用前后台双端架构设计，提高系统扩展性与可维护性。
+
+```
+
+```
